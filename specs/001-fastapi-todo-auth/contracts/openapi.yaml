@@ -1,0 +1,302 @@
+openapi: 3.0.0
+info:
+  title: Todo API with JWT Authentication
+  version: 1.0.0
+  description: API for managing user-specific todo items with JWT-based authentication.
+servers:
+  - url: http://localhost:8000
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Todo:
+      type: object
+      required:
+        - id
+        - user_id
+        - title
+        - status
+        - priority
+        - due_date
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the todo item.
+          readOnly: true
+        user_id:
+          type: string
+          description: Identifier of the user who owns this todo.
+          readOnly: true
+        title:
+          type: string
+          maxLength: 500
+          description: A concise title for the todo item.
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+          description: A detailed explanation or additional notes for the todo item.
+        status:
+          type: string
+          enum: [pending, completed]
+          default: pending
+          description: The current completion state of the todo.
+        priority:
+          type: string
+          enum: [low, medium, high]
+          default: medium
+          description: The importance level of the todo item.
+        due_date:
+          type: string
+          format: date
+          description: The target date by which the todo should be completed (YYYY-MM-DD).
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the todo item was created.
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the todo item was last updated.
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the todo item was marked as completed.
+
+    TodoCreate:
+      type: object
+      required:
+        - title
+        - priority
+        - due_date
+      properties:
+        title:
+          type: string
+          maxLength: 500
+          description: A concise title for the todo item.
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+          description: A detailed explanation or additional notes for the todo item.
+        priority:
+          type: string
+          enum: [low, medium, high]
+          default: medium
+          description: The importance level of the todo item.
+        due_date:
+          type: string
+          format: date
+          description: The target date by which the todo should be completed (YYYY-MM-DD).
+
+    TodoUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 500
+          description: A concise title for the todo item.
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+          description: A detailed explanation or additional notes for the todo item.
+        status:
+          type: string
+          enum: [pending, completed]
+          description: The current completion state of the todo.
+        priority:
+          type: string
+          enum: [low, medium, high]
+          description: The importance level of the todo item.
+        due_date:
+          type: string
+          format: date
+          description: The target date by which the todo should be completed (YYYY-MM-DD).
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          description: A human-readable description of the error.
+
+security:
+  - bearerAuth: []
+
+paths:
+  /todos/:
+    get:
+      summary: Get All Todos
+      operationId: get_all_todos
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of todo items for the authenticated user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+        '401':
+          description: Unauthorized - Missing or invalid token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Add New Todo
+      operationId: add_todo
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoCreate'
+      responses:
+        '201':
+          description: The newly created todo item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '401':
+          description: Unauthorized - Missing or invalid token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error - Invalid request body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /todos/{todo_id}:
+    parameters:
+      - name: todo_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the todo item.
+    put:
+      summary: Update Todo
+      operationId: update_todo
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoUpdate'
+      responses:
+        '200':
+          description: The updated todo item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '401':
+          description: Unauthorized - Missing or invalid token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found - Todo item not found or not owned by user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation Error - Invalid request body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete Todo
+      operationId: delete_todo
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: No Content - Todo item successfully deleted.
+        '401':
+          description: Unauthorized - Missing or invalid token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found - Todo item not found or not owned by user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /todos/{todo_id}/complete:
+    parameters:
+      - name: todo_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: The ID of the todo item to mark as complete/incomplete.
+    patch:
+      summary: Toggle Todo Completion Status
+      operationId: toggle_complete_todo
+      tags:
+        - Todos
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: The updated todo item with toggled status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '401':
+          description: Unauthorized - Missing or invalid token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found - Todo item not found or not owned by user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

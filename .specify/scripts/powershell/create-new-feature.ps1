@@ -5,35 +5,47 @@ param(
     [switch]$Json,
     [string]$ShortName,
     [int]$Number = 0,
+    [string]$FeatureFile, # Added parameter
     [switch]$Help,
-    [Parameter(ValueFromRemainingArguments = $true)]
-    [string[]]$FeatureDescription
+    [string[]]$FeatureDescription # Removed ValueFromRemainingArguments
 )
 $ErrorActionPreference = 'Stop'
 
 # Show help if requested
 if ($Help) {
-    Write-Host "Usage: ./create-new-feature.ps1 [-Json] [-ShortName <name>] [-Number N] <feature description>"
+    Write-Host "Usage: ./create-new-feature.ps1 [-Json] [-ShortName <name>] [-Number N] [-FeatureFile <path>] <feature description>" # Updated usage
     Write-Host ""
     Write-Host "Options:"
     Write-Host "  -Json               Output in JSON format"
     Write-Host "  -ShortName <name>   Provide a custom short name (2-4 words) for the branch"
     Write-Host "  -Number N           Specify branch number manually (overrides auto-detection)"
+    Write-Host "  -FeatureFile <path> Read feature description from file" # Added option
     Write-Host "  -Help               Show this help message"
     Write-Host ""
     Write-Host "Examples:"
     Write-Host "  ./create-new-feature.ps1 'Add user authentication system' -ShortName 'user-auth'"
+    Write-Host "  ./create-new-feature.ps1 -FeatureFile './my-feature.md' -ShortName 'my-feature'" # Added example
     Write-Host "  ./create-new-feature.ps1 'Implement OAuth2 integration for API'"
     exit 0
 }
 
-# Check if feature description provided
-if (-not $FeatureDescription -or $FeatureDescription.Count -eq 0) {
-    Write-Error "Usage: ./create-new-feature.ps1 [-Json] [-ShortName <name>] <feature description>"
-    exit 1
+# Determine feature description source
+$featureDesc = ""
+if ($PSBoundParameters.ContainsKey('FeatureFile')) {
+    if (-not (Test-Path $FeatureFile)) {
+        Write-Error "Error: Feature file not found at '$FeatureFile'"
+        exit 1
+    }
+    $featureDesc = (Get-Content -Raw -Path $FeatureFile)
+} elseif ($FeatureDescription -and $FeatureDescription.Count -gt 0) {
+    $featureDesc = ($FeatureDescription -join ' ').Trim()
 }
 
-$featureDesc = ($FeatureDescription -join ' ').Trim()
+# Check if feature description provided
+if ([string]::IsNullOrEmpty($featureDesc)) {
+    Write-Error "Usage: ./create-new-feature.ps1 [-Json] [-ShortName <name>] [-FeatureFile <path>] <feature description>" # Updated usage
+    exit 1
+}
 
 # Resolve repository root. Prefer git information when available, but fall back
 # to searching for repository markers so the workflow still functions in repositories that

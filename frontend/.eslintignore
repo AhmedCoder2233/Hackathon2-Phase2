@@ -1,0 +1,7 @@
+# .eslintignore for Next.js frontend
+
+node_modules/
+.next/
+out/
+build/
+coverage/

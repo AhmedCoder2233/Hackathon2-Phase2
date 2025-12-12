@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset & Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --background: #ffffff; /* white */
+  --foreground: #171717; /* very dark gray for text */
+
+  /* Grays */
+  --gray-50: #f8fafc; /* new light gray */
+  --gray-100: #f1f5f9; /* slightly darker light gray */
+  --gray-200: #e2e8f0; /* light gray */
+  --gray-300: #cbd5e1; /* medium light gray */
+  --gray-400: #94a3b8; /* medium gray */
+  --gray-500: #64748b; /* medium dark gray */
+  --gray-600: #475569; /* dark gray */
+  --gray-700: #334155; /* darker gray */
+  --gray-800: #1e293b; /* very dark gray */
+  --gray-900: #0f172a; /* almost black */
+
+  /* Primary Blue/Indigo */
+  --primary-50: #e0f2fe; /* light blue */
+  --primary-100: #bae6fd; /* light blue */
+  --primary-200: #7dd3fc; /* light blue */
+  --primary-300: #38bdf8; /* blue */
+  --primary-400: #0ea5e9; /* blue */
+  --primary-500: #0284c7; /* deep blue */
+  --primary-600: #0369a1; /* deeper blue */
+  --primary-700: #075985; /* indigo-like */
+  --primary-800: #0c4a6e; /* dark indigo */
+  --primary-900: #0f3455; /* very dark indigo */
+
+  /* Secondary/Accent Colors */
+  --accent-50: #fdf2f8; /* very light pink */
+  --accent-100: #fce7f3; /* light pink */
+  --accent-200: #fbcfe8; /* pink */
+  --accent-300: #f9a8d4; /* medium pink */
+  --accent-400: #f472b6; /* dark pink */
+  --accent-500: #ec4899; /* magenta */
+  --accent-600: #db2777; /* deep magenta */
+  --accent-700: #be185d; /* berry */
+  --accent-800: #9d174d; /* deep berry */
+  --accent-900: #701a45; /* very deep berry */
+
+  /* Success/Green */
+  --success-50: #ecfdf5;
+  --success-100: #d1fae5;
+  --success-200: #a7f3d0;
+  --success-300: #6ee7b7;
+  --success-400: #34d399;
+  --success-500: #10b981;
+  --success-600: #059669;
+  --success-700: #047857;
+  --success-800: #065f46;
+  --success-900: #064e3b;
+
+  /* Warning/Yellow (new) */
+  --warning-50: #fffbeb;
+  --warning-100: #fef3c7;
+  --warning-200: #fde68a;
+  --warning-300: #fcd34d;
+  --warning-400: #fbbf24;
+  --warning-500: #f59e0b;
+  --warning-600: #d97706;
+  --warning-700: #b45309;
+  --warning-800: #92400e;
+  --warning-900: #78350f;
+
+  /* Danger/Red (new) */
+  --danger-50: #fef2f2;
+  --danger-100: #fee2e2;
+  --danger-200: #fecaca;
+  --danger-300: #fca5a5;
+  --danger-400: #f87171;
+  --danger-500: #ef4444;
+  --danger-600: #dc2626;
+  --danger-700: #b91c1c;
+  --danger-800: #991b1b;
+  --danger-900: #7f1d1d;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+}
